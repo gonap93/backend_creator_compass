@@ -1,0 +1,642 @@
+2025-04-05 17:39:14,845 - uvicorn.error - INFO - Started server process [91933]
+2025-04-05 17:39:14,846 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-05 17:39:14,847 - uvicorn.error - INFO - Application startup complete.
+2025-04-05 17:39:26,553 - uvicorn.error - INFO - Shutting down
+2025-04-05 17:39:26,655 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-04-05 17:39:26,656 - uvicorn.error - INFO - Application shutdown complete.
+2025-04-05 17:39:26,657 - uvicorn.error - INFO - Finished server process [91933]
+2025-04-05 17:39:27,560 - uvicorn.error - INFO - Started server process [91946]
+2025-04-05 17:39:27,561 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-05 17:39:27,562 - uvicorn.error - INFO - Application startup complete.
+2025-04-05 17:39:28,270 - uvicorn.error - INFO - Shutting down
+2025-04-05 17:39:28,372 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-04-05 17:39:28,374 - uvicorn.error - INFO - Application shutdown complete.
+2025-04-05 17:39:28,375 - uvicorn.error - INFO - Finished server process [91946]
+2025-04-05 17:39:29,273 - uvicorn.error - INFO - Started server process [91949]
+2025-04-05 17:39:29,274 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-05 17:39:29,275 - uvicorn.error - INFO - Application startup complete.
+2025-04-05 17:39:43,695 - uvicorn.error - INFO - Shutting down
+2025-04-05 17:39:43,797 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-04-05 17:39:43,798 - uvicorn.error - INFO - Application shutdown complete.
+2025-04-05 17:39:43,799 - uvicorn.error - INFO - Finished server process [91949]
+2025-04-05 18:26:52,347 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-05 18:26:52,348 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:26:52,353 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-05 18:26:52,353 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:26:52,356 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-05 18:26:52,356 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:26:52,357 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-05 18:26:52,360 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-05 18:26:52,360 - sqlalchemy.engine.Engine - INFO - [generated in 0.00040s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-05 18:26:52,377 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-05 18:26:52,377 - sqlalchemy.engine.Engine - INFO - [generated in 0.00030s] ('tone', 'pg_catalog')
+2025-04-05 18:26:52,381 - sqlalchemy.engine.Engine - INFO - CREATE TYPE tone AS ENUM ('LUXURIOUS', 'INFORMATIVE', 'FUNNY', 'SALES', 'GEN_Z')
+2025-04-05 18:26:52,381 - sqlalchemy.engine.Engine - INFO - [no key 0.00028s] ()
+2025-04-05 18:26:52,400 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE chat_history (
+	id SERIAL NOT NULL, 
+	message TEXT NOT NULL, 
+	response TEXT NOT NULL, 
+	tone tone NOT NULL, 
+	timestamp TIMESTAMP WITHOUT TIME ZONE, 
+	PRIMARY KEY (id)
+)
+
+
+2025-04-05 18:26:52,401 - sqlalchemy.engine.Engine - INFO - [no key 0.00036s] ()
+2025-04-05 18:26:52,430 - sqlalchemy.engine.Engine - INFO - CREATE INDEX ix_chat_history_id ON chat_history (id)
+2025-04-05 18:26:52,430 - sqlalchemy.engine.Engine - INFO - [no key 0.00024s] ()
+2025-04-05 18:26:52,433 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-05 18:26:52,435 - main - INFO - Database initialized
+2025-04-05 18:30:24,571 - main - INFO - Processing chat request with tone: Tone.SALES
+2025-04-05 18:30:25,426 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-04-05 18:30:25,459 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-05 18:30:25,467 - sqlalchemy.engine.Engine - INFO - INSERT INTO chat_history (message, response, tone, timestamp) VALUES ($1::VARCHAR, $2::VARCHAR, $3::tone, $4::TIMESTAMP WITHOUT TIME ZONE) RETURNING chat_history.id
+2025-04-05 18:30:25,467 - sqlalchemy.engine.Engine - INFO - [generated in 0.00080s] ('miren los perfumes árabes que vendo. comprenme', '¡Por supuesto! Me alegra que estén interesado en nuestros perfumes árabes exóticos y únicos. Al explorar nuestra selección, podrán descubrir aromas a ... (988 characters truncated) ... para vestir.\n\n¿Qué te llama la atención de nuestros perfumes árabes? ¿Buscas un regalo especial para alguien o quieres tratarte a ti mismo también?', 'SALES', datetime.datetime(2025, 4, 5, 21, 30, 25, 467260))
+2025-04-05 18:30:25,512 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-05 18:30:25,516 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-05 18:30:25,519 - sqlalchemy.engine.Engine - INFO - SELECT chat_history.id, chat_history.message, chat_history.response, chat_history.tone, chat_history.timestamp 
+FROM chat_history 
+WHERE chat_history.id = $1::INTEGER
+2025-04-05 18:30:25,520 - sqlalchemy.engine.Engine - INFO - [generated in 0.00041s] (1,)
+2025-04-05 18:30:25,522 - main - INFO - Chat completion successful and stored in database
+2025-04-05 18:30:25,525 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-05 18:32:26,734 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-05 18:32:26,735 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:32:26,737 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-05 18:32:26,737 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:32:26,738 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-05 18:32:26,739 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:32:26,740 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-05 18:32:26,744 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-05 18:32:26,745 - sqlalchemy.engine.Engine - INFO - [generated in 0.00027s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-05 18:32:26,750 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-05 18:32:26,750 - sqlalchemy.engine.Engine - INFO - [generated in 0.00025s] ('tone', 'pg_catalog')
+2025-04-05 18:32:26,753 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-05 18:32:26,754 - main - INFO - Database initialized
+2025-04-05 18:34:55,527 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-05 18:34:55,528 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:34:55,530 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-05 18:34:55,530 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:34:55,532 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-05 18:34:55,532 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:34:55,533 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-05 18:34:55,539 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-05 18:34:55,539 - sqlalchemy.engine.Engine - INFO - [generated in 0.00068s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-05 18:34:55,546 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-05 18:34:55,546 - sqlalchemy.engine.Engine - INFO - [generated in 0.00027s] ('tone', 'pg_catalog')
+2025-04-05 18:34:55,547 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-05 18:34:55,548 - main - INFO - Database initialized
+2025-04-05 18:35:59,473 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-05 18:35:59,474 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:35:59,476 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-05 18:35:59,476 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:35:59,477 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-05 18:35:59,477 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:35:59,480 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-05 18:35:59,486 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-05 18:35:59,487 - sqlalchemy.engine.Engine - INFO - [generated in 0.00048s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-05 18:35:59,494 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-05 18:35:59,494 - sqlalchemy.engine.Engine - INFO - [generated in 0.00061s] ('tone', 'pg_catalog')
+2025-04-05 18:35:59,497 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-05 18:35:59,498 - main - INFO - Database initialized
+2025-04-05 18:36:37,980 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-05 18:36:37,981 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:36:37,985 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-05 18:36:37,985 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:36:37,989 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-05 18:36:37,989 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:36:37,991 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-05 18:36:37,994 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-05 18:36:37,994 - sqlalchemy.engine.Engine - INFO - [generated in 0.00036s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-05 18:36:38,001 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-05 18:36:38,001 - sqlalchemy.engine.Engine - INFO - [generated in 0.00034s] ('tone', 'pg_catalog')
+2025-04-05 18:36:38,003 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-05 18:36:38,004 - main - INFO - Database initialized
+2025-04-05 18:38:26,316 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-05 18:38:26,316 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:38:26,322 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-05 18:38:26,322 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:38:26,325 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-05 18:38:26,325 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-05 18:38:26,327 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-05 18:38:26,333 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-05 18:38:26,334 - sqlalchemy.engine.Engine - INFO - [generated in 0.00102s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-05 18:38:26,345 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-05 18:38:26,345 - sqlalchemy.engine.Engine - INFO - [generated in 0.00024s] ('tone', 'pg_catalog')
+2025-04-05 18:38:26,347 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-05 18:38:26,348 - main - INFO - Database initialized
+2025-04-06 17:55:45,421 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-06 17:55:45,422 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-06 17:55:45,455 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-06 17:55:45,455 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-06 17:55:45,459 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-06 17:55:45,459 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-06 17:55:45,461 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-06 17:55:45,464 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-06 17:55:45,464 - sqlalchemy.engine.Engine - INFO - [generated in 0.00031s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-06 17:55:45,485 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-06 17:55:45,485 - sqlalchemy.engine.Engine - INFO - [generated in 0.00040s] ('tone', 'pg_catalog')
+2025-04-06 17:55:45,487 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-06 17:55:45,487 - main - INFO - Database initialized
+2025-04-06 18:13:39,987 - main - INFO - Processing chat request with tone: Tone.SALES
+2025-04-06 18:13:41,548 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-04-06 18:13:41,631 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-06 18:13:41,655 - sqlalchemy.engine.Engine - INFO - INSERT INTO chat_history (message, response, tone, timestamp) VALUES ($1::VARCHAR, $2::VARCHAR, $3::tone, $4::TIMESTAMP WITHOUT TIME ZONE) RETURNING chat_history.id
+2025-04-06 18:13:41,656 - sqlalchemy.engine.Engine - INFO - [generated in 0.00138s] ('miren estas fundas de almohada de satén, son las mejores y tienen que comprarlas!', '¡Entiendo tu entusiasmo por esas fundas de almohada de satén! Son absolutamente increíbles. Aquí te presento algunas razones por las que creo que son ... (1037 characters truncated) ... revitalizado y listo para el día.\n\n¿Qué te parece si te recomiendo algunas marcas fiables que ofrezcan fundas de almohada de satén de alta calidad?', 'SALES', datetime.datetime(2025, 4, 6, 21, 13, 41, 655685))
+2025-04-06 18:13:41,754 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-06 18:13:41,760 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-06 18:13:41,768 - sqlalchemy.engine.Engine - INFO - SELECT chat_history.id, chat_history.message, chat_history.response, chat_history.tone, chat_history.timestamp 
+FROM chat_history 
+WHERE chat_history.id = $1::INTEGER
+2025-04-06 18:13:41,768 - sqlalchemy.engine.Engine - INFO - [generated in 0.00051s] (2,)
+2025-04-06 18:13:41,772 - main - INFO - Chat completion successful and stored in database
+2025-04-06 18:13:41,780 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-11 14:47:39,822 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 14:47:39,823 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 14:47:39,832 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 14:47:39,832 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 14:47:39,837 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 14:47:39,838 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 14:47:39,841 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 14:47:39,854 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 14:47:39,854 - sqlalchemy.engine.Engine - INFO - [generated in 0.00051s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 14:47:39,896 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 14:47:39,896 - sqlalchemy.engine.Engine - INFO - [generated in 0.00027s] ('tone', 'pg_catalog')
+2025-04-11 14:47:39,898 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 14:47:39,899 - main - INFO - Database initialized
+2025-04-11 18:18:19,557 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 18:18:19,557 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:18:19,566 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 18:18:19,566 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:18:19,569 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 18:18:19,569 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:18:19,572 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:18:19,582 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:18:19,584 - sqlalchemy.engine.Engine - INFO - [generated in 0.00263s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:18:19,612 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 18:18:19,612 - sqlalchemy.engine.Engine - INFO - [generated in 0.00054s] ('tone', 'pg_catalog')
+2025-04-11 18:18:19,614 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:18:19,615 - main - INFO - Database initialized
+2025-04-11 18:22:49,371 - main - INFO - Processing chat request with tone: Tone.SALES
+2025-04-11 18:22:50,811 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-04-11 18:22:50,835 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:22:50,842 - sqlalchemy.engine.Engine - INFO - INSERT INTO chat_history (message, response, tone, timestamp) VALUES ($1::VARCHAR, $2::VARCHAR, $3::tone, $4::TIMESTAMP WITHOUT TIME ZONE) RETURNING chat_history.id
+2025-04-11 18:22:50,843 - sqlalchemy.engine.Engine - INFO - [generated in 0.00153s] ('miren estas fundas de almohada de satén, son las mejores y tienen que comprarlas!', '¡Descubre el secreto para dormir mejor cada noche! \n\nLas fundas de almohada de satén que estás viendo son sin duda una de las mejores opciones para ... (708 characters truncated) ... 100%\n\n¿No dejas pasar la oportunidad como esta de cuidar tu sueño de calidad? **Compra ahora y asegúrate de dormir como nunca antes**! [Vende aquí]', 'SALES', datetime.datetime(2025, 4, 11, 21, 22, 50, 842506))
+2025-04-11 18:22:50,938 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:22:50,942 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:22:50,947 - sqlalchemy.engine.Engine - INFO - SELECT chat_history.id, chat_history.message, chat_history.response, chat_history.tone, chat_history.timestamp 
+FROM chat_history 
+WHERE chat_history.id = $1::INTEGER
+2025-04-11 18:22:50,947 - sqlalchemy.engine.Engine - INFO - [generated in 0.00025s] (3,)
+2025-04-11 18:22:50,950 - main - INFO - Chat completion successful and stored in database
+2025-04-11 18:22:50,952 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-11 18:23:24,390 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 18:23:24,390 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:23:24,401 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 18:23:24,402 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:23:24,407 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 18:23:24,413 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:23:24,487 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:23:24,512 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:23:24,512 - sqlalchemy.engine.Engine - INFO - [generated in 0.00107s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:23:24,545 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 18:23:24,552 - sqlalchemy.engine.Engine - INFO - [generated in 0.00902s] ('tone', 'pg_catalog')
+2025-04-11 18:23:24,557 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:23:24,563 - main - INFO - Database initialized
+2025-04-11 18:25:32,134 - main - INFO - Processing chat request with tone: Tone.SALES
+2025-04-11 18:25:32,845 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-04-11 18:25:32,868 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:25:32,872 - sqlalchemy.engine.Engine - INFO - INSERT INTO chat_history (message, response, tone, timestamp) VALUES ($1::VARCHAR, $2::VARCHAR, $3::tone, $4::TIMESTAMP WITHOUT TIME ZONE) RETURNING chat_history.id
+2025-04-11 18:25:32,873 - sqlalchemy.engine.Engine - INFO - [generated in 0.00133s] ('miren estas fundas de almohada de satén, son las mejores y tienen que comprarlas!', '¡Descubre el secreto para una duras noche de sueño con estas fundas de almohada de satén ❤️ 🔥!\n\n¿Estás cansado de levantarte con agotamiento y dolo ... (582 characters truncated) ... ergía renovada y un espíritu revitalizado! 💯\n\n**Offer Special:** Obten un 15% de descuento en tu primera compra. ¡Usa código SUEÑO15 al checkout! ⚡', 'SALES', datetime.datetime(2025, 4, 11, 21, 25, 32, 872230))
+2025-04-11 18:25:32,925 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:25:32,934 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:25:32,936 - sqlalchemy.engine.Engine - INFO - SELECT chat_history.id, chat_history.message, chat_history.response, chat_history.tone, chat_history.timestamp 
+FROM chat_history 
+WHERE chat_history.id = $1::INTEGER
+2025-04-11 18:25:32,936 - sqlalchemy.engine.Engine - INFO - [generated in 0.00026s] (4,)
+2025-04-11 18:25:32,944 - main - INFO - Chat completion successful and stored in database
+2025-04-11 18:25:32,945 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-11 18:25:43,784 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 18:25:43,784 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:25:43,787 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 18:25:43,787 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:25:43,788 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 18:25:43,789 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:25:43,790 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:25:43,794 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:25:43,794 - sqlalchemy.engine.Engine - INFO - [generated in 0.00036s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:25:43,802 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 18:25:43,802 - sqlalchemy.engine.Engine - INFO - [generated in 0.00037s] ('tone', 'pg_catalog')
+2025-04-11 18:25:43,803 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:25:43,804 - main - INFO - Database initialized
+2025-04-11 18:36:31,966 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 18:36:31,967 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:36:31,979 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 18:36:31,980 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:36:31,986 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 18:36:31,988 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:36:31,998 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:36:32,016 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:36:32,017 - sqlalchemy.engine.Engine - INFO - [generated in 0.00186s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:36:32,039 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:36:32,040 - sqlalchemy.engine.Engine - INFO - [cached since 0.02502s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:36:32,071 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 18:36:32,071 - sqlalchemy.engine.Engine - INFO - [generated in 0.00088s] ('tone', 'pg_catalog')
+2025-04-11 18:36:32,126 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE tiktok_videos (
+	id VARCHAR NOT NULL, 
+	username VARCHAR NOT NULL, 
+	caption TEXT NOT NULL, 
+	hashtags VARCHAR[], 
+	likes INTEGER NOT NULL, 
+	comments INTEGER NOT NULL, 
+	shares INTEGER NOT NULL, 
+	publish_date TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	music VARCHAR, 
+	thumbnail_url VARCHAR, 
+	video_url VARCHAR NOT NULL, 
+	created_at TIMESTAMP WITHOUT TIME ZONE, 
+	updated_at TIMESTAMP WITHOUT TIME ZONE, 
+	PRIMARY KEY (id)
+)
+
+
+2025-04-11 18:36:32,154 - sqlalchemy.engine.Engine - INFO - [no key 0.02902s] ()
+2025-04-11 18:36:32,338 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:36:32,341 - main - INFO - Database initialized
+2025-04-11 18:37:58,143 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 18:37:58,144 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:37:58,149 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 18:37:58,149 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:37:58,152 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 18:37:58,152 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:37:58,160 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:37:58,166 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:37:58,166 - sqlalchemy.engine.Engine - INFO - [generated in 0.00058s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:37:58,176 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:37:58,177 - sqlalchemy.engine.Engine - INFO - [cached since 0.01107s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:37:58,182 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 18:37:58,182 - sqlalchemy.engine.Engine - INFO - [generated in 0.00041s] ('tone', 'pg_catalog')
+2025-04-11 18:37:58,184 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:37:58,185 - main - INFO - Database initialized
+2025-04-11 18:38:40,560 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 18:38:40,561 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:38:40,565 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 18:38:40,566 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:38:40,570 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 18:38:40,570 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:38:40,574 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:38:40,582 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:38:40,582 - sqlalchemy.engine.Engine - INFO - [generated in 0.00053s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:38:40,594 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:38:40,595 - sqlalchemy.engine.Engine - INFO - [cached since 0.01334s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:38:40,599 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 18:38:40,600 - sqlalchemy.engine.Engine - INFO - [generated in 0.00056s] ('tone', 'pg_catalog')
+2025-04-11 18:38:40,604 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:38:40,606 - main - INFO - Database initialized
+2025-04-11 18:40:12,806 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 18:40:12,806 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:40:12,819 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 18:40:12,819 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:40:12,822 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 18:40:12,822 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:40:12,828 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:40:12,852 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:40:12,852 - sqlalchemy.engine.Engine - INFO - [generated in 0.00075s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:40:12,946 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:40:12,946 - sqlalchemy.engine.Engine - INFO - [cached since 0.09468s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:40:12,954 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 18:40:12,954 - sqlalchemy.engine.Engine - INFO - [generated in 0.00053s] ('tone', 'pg_catalog')
+2025-04-11 18:40:12,958 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:40:12,960 - main - INFO - Database initialized
+2025-04-11 18:43:07,029 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 18:43:07,031 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:43:07,039 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 18:43:07,040 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:43:07,046 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 18:43:07,047 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:43:07,053 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:43:07,072 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:43:07,073 - sqlalchemy.engine.Engine - INFO - [generated in 0.00197s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:43:07,140 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:43:07,150 - sqlalchemy.engine.Engine - INFO - [cached since 0.07751s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:43:07,185 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 18:43:07,187 - sqlalchemy.engine.Engine - INFO - [generated in 0.00187s] ('tone', 'pg_catalog')
+2025-04-11 18:43:07,206 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:43:07,219 - main - INFO - Database initialized
+2025-04-11 18:51:39,222 - httpx - INFO - HTTP Request: POST https://api.apify.com/v2/actor-tasks/wxaXNvLF15VbRZTMp/runs "HTTP/1.1 401 Unauthorized"
+2025-04-11 18:51:39,224 - main - ERROR - Error scraping TikTok videos: Client error '401 Unauthorized' for url 'https://api.apify.com/v2/actor-tasks/wxaXNvLF15VbRZTMp/runs'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+Traceback (most recent call last):
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/main.py", line 152, in scrape_tiktok_videos
+    result = await tiktok_service.scrape_user_videos(db, request.username)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/services/tiktok.py", line 157, in scrape_user_videos
+    run_data = await self.run_scraper(username)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/services/tiktok.py", line 38, in run_scraper
+    response.raise_for_status()
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/.venv/lib/python3.11/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.apify.com/v2/actor-tasks/wxaXNvLF15VbRZTMp/runs'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-04-11 18:51:58,576 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 18:51:58,576 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:51:58,580 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 18:51:58,580 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:51:58,585 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 18:51:58,585 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 18:51:58,587 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 18:51:58,600 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:51:58,601 - sqlalchemy.engine.Engine - INFO - [generated in 0.00163s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:51:58,613 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 18:51:58,614 - sqlalchemy.engine.Engine - INFO - [cached since 0.01498s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 18:51:58,621 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 18:51:58,621 - sqlalchemy.engine.Engine - INFO - [generated in 0.00126s] ('tone', 'pg_catalog')
+2025-04-11 18:51:58,624 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 18:51:58,629 - main - INFO - Database initialized
+2025-04-11 19:14:41,339 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 19:14:41,339 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:14:41,341 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 19:14:41,342 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:14:41,343 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 19:14:41,343 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:14:41,345 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 19:14:41,349 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:14:41,349 - sqlalchemy.engine.Engine - INFO - [generated in 0.00038s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:14:41,358 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:14:41,359 - sqlalchemy.engine.Engine - INFO - [cached since 0.009961s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:14:41,361 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 19:14:41,361 - sqlalchemy.engine.Engine - INFO - [generated in 0.00024s] ('tone', 'pg_catalog')
+2025-04-11 19:14:41,363 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 19:14:41,364 - main - INFO - Database initialized
+2025-04-11 19:16:25,561 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 19:16:25,561 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:16:25,564 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 19:16:25,564 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:16:25,568 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 19:16:25,568 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:16:25,570 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 19:16:25,577 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:16:25,578 - sqlalchemy.engine.Engine - INFO - [generated in 0.00043s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:16:25,582 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:16:25,582 - sqlalchemy.engine.Engine - INFO - [cached since 0.005194s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:16:25,590 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 19:16:25,605 - sqlalchemy.engine.Engine - INFO - [generated in 0.01552s] ('tone', 'pg_catalog')
+2025-04-11 19:16:25,609 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 19:16:25,626 - main - INFO - Database initialized
+2025-04-11 19:18:28,176 - httpx - INFO - HTTP Request: POST https://api.apify.com/v2/acts/wxaXNvLF15VbRZTMp/runs "HTTP/1.1 404 Not Found"
+2025-04-11 19:21:49,300 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 19:21:49,301 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:21:49,305 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 19:21:49,306 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:21:49,310 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 19:21:49,310 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:21:49,316 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 19:21:49,326 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:21:49,326 - sqlalchemy.engine.Engine - INFO - [generated in 0.00069s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:21:49,336 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:21:49,337 - sqlalchemy.engine.Engine - INFO - [cached since 0.01136s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:21:49,341 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 19:21:49,341 - sqlalchemy.engine.Engine - INFO - [generated in 0.00040s] ('tone', 'pg_catalog')
+2025-04-11 19:21:49,343 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 19:21:49,345 - main - INFO - Database initialized
+2025-04-11 19:22:40,674 - httpx - INFO - HTTP Request: POST https://api.apify.com/v2/acts/wxaXNvLF15VbRZTMp/runs "HTTP/1.1 404 Not Found"
+2025-04-11 19:22:40,680 - main - ERROR - Error scraping TikTok videos: Apify API error: Actor was not found
+Traceback (most recent call last):
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/services/tiktok.py", line 33, in run_scraper
+    run = self.client.actor(self.actor_id).call(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/.venv/lib/python3.11/site-packages/apify_client/_logging.py", line 82, in wrapper
+    return fun(resource_client, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/.venv/lib/python3.11/site-packages/apify_client/clients/resource_clients/actor.py", line 266, in call
+    started_run = self.start(
+                  ^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/.venv/lib/python3.11/site-packages/apify_client/_logging.py", line 82, in wrapper
+    return fun(resource_client, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/.venv/lib/python3.11/site-packages/apify_client/clients/resource_clients/actor.py", line 219, in start
+    response = self.http_client.call(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/.venv/lib/python3.11/site-packages/apify_client/_http_client.py", line 194, in call
+    return retry_with_exp_backoff(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/.venv/lib/python3.11/site-packages/apify_client/_utils.py", line 64, in retry_with_exp_backoff
+    return func(stop_retrying, attempt)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/.venv/lib/python3.11/site-packages/apify_client/_http_client.py", line 192, in _make_request
+    raise ApifyApiError(response, attempt)
+apify_client._errors.ApifyApiError: Actor was not found
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/main.py", line 152, in scrape_tiktok_videos
+    result = await tiktok_service.scrape_user_videos(db, request.username)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/services/tiktok.py", line 146, in scrape_user_videos
+    run_data = await self.run_scraper(username)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/services/tiktok.py", line 41, in run_scraper
+    raise Exception(f"Apify API error: {str(e)}")
+Exception: Apify API error: Actor was not found
+2025-04-11 19:25:16,783 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 19:25:16,784 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:25:16,792 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 19:25:16,792 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:25:16,801 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 19:25:16,804 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:25:16,814 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 19:25:16,828 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:25:16,829 - sqlalchemy.engine.Engine - INFO - [generated in 0.00070s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:25:16,852 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:25:16,872 - sqlalchemy.engine.Engine - INFO - [cached since 0.04353s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:25:16,882 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 19:25:16,882 - sqlalchemy.engine.Engine - INFO - [generated in 0.00097s] ('tone', 'pg_catalog')
+2025-04-11 19:25:16,886 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 19:25:16,888 - main - INFO - Database initialized
+2025-04-11 19:25:26,808 - httpx - INFO - HTTP Request: POST https://api.apify.com/v2/acts/clockworks~tiktok-scraper/runs "HTTP/1.1 201 Created"
+2025-04-11 19:25:28,002 - httpx - INFO - HTTP Request: GET https://api.apify.com/v2/actor-runs/qdUxfvymAiGlynXLZ?waitForFinish=999999 "HTTP/1.1 200 OK"
+2025-04-11 19:25:29,169 - httpx - INFO - HTTP Request: GET https://api.apify.com/v2/actor-runs/qdUxfvymAiGlynXLZ "HTTP/1.1 200 OK"
+2025-04-11 19:25:29,170 - main - ERROR - Error scraping TikTok videos: Run failed with status: FAILED
+Traceback (most recent call last):
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/main.py", line 152, in scrape_tiktok_videos
+    result = await tiktok_service.scrape_user_videos(db, request.username)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/services/tiktok.py", line 150, in scrape_user_videos
+    await self.wait_for_run_to_finish(run_id)
+  File "/Users/gonzalopena/cursor_projects/social_networks_ai/fastapi/services/tiktok.py", line 54, in wait_for_run_to_finish
+    raise Exception(f"Run failed with status: {run['status']}")
+Exception: Run failed with status: FAILED
+2025-04-11 19:32:05,482 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 19:32:05,484 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:32:06,515 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 19:32:06,516 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:32:06,522 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 19:32:06,523 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:32:06,539 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 19:32:06,568 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:32:06,569 - sqlalchemy.engine.Engine - INFO - [generated in 0.00111s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:32:06,821 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:32:06,821 - sqlalchemy.engine.Engine - INFO - [cached since 0.2535s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:32:07,261 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 19:32:07,262 - sqlalchemy.engine.Engine - INFO - [generated in 0.00124s] ('tone', 'pg_catalog')
+2025-04-11 19:32:07,705 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 19:32:07,721 - main - INFO - Database initialized
+2025-04-11 19:32:37,694 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 19:32:37,695 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:32:37,699 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 19:32:37,699 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:32:37,702 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 19:32:37,703 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:32:37,705 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 19:32:37,717 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:32:37,717 - sqlalchemy.engine.Engine - INFO - [generated in 0.00057s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:32:37,722 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:32:37,722 - sqlalchemy.engine.Engine - INFO - [cached since 0.005715s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:32:37,729 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 19:32:37,732 - sqlalchemy.engine.Engine - INFO - [generated in 0.00260s] ('tone', 'pg_catalog')
+2025-04-11 19:32:37,737 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 19:32:37,738 - main - INFO - Database initialized
+2025-04-11 19:34:57,775 - httpx - INFO - HTTP Request: POST https://api.apify.com/v2/acts/clockworks~tiktok-scraper/runs "HTTP/1.1 201 Created"
+2025-04-11 19:34:58,981 - httpx - INFO - HTTP Request: GET https://api.apify.com/v2/actor-runs/gK8BLDfh9Vu9vMTs5?waitForFinish=999999 "HTTP/1.1 200 OK"
+2025-04-11 19:35:00,783 - httpx - INFO - HTTP Request: GET https://api.apify.com/v2/actor-runs/gK8BLDfh9Vu9vMTs5 "HTTP/1.1 200 OK"
+2025-04-11 19:38:57,233 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-11 19:38:57,233 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:38:57,236 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-11 19:38:57,236 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:38:57,237 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-11 19:38:57,237 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-11 19:38:57,238 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-11 19:38:57,243 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:38:57,243 - sqlalchemy.engine.Engine - INFO - [generated in 0.00039s] ('chat_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:38:57,249 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-04-11 19:38:57,249 - sqlalchemy.engine.Engine - INFO - [cached since 0.006167s ago] ('tiktok_videos', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-04-11 19:38:57,251 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-04-11 19:38:57,251 - sqlalchemy.engine.Engine - INFO - [generated in 0.00020s] ('tone', 'pg_catalog')
+2025-04-11 19:38:57,252 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-11 19:38:57,253 - main - INFO - Database initialized
