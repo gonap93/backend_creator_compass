@@ -10,7 +10,7 @@ import uuid
 load_dotenv()  # only works locally, won’t affect Railway
 
 # Get database URL from environment variable or use default
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://gonap93:gonap93@localhost:5432/chat_history")
+DATABASE_URL = os.getenv("DATABASE_URL_RAILWAY", "postgresql+asyncpg://gonap93:gonap93@localhost:5432/chat_history")
 
 # Create async engine
 engine = create_async_engine(DATABASE_URL, echo=True)
