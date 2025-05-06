@@ -10,11 +10,12 @@ from pydantic import BaseModel
 from groq import Groq
 from system_messages import Tone, SYSTEM_MESSAGES
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db, init_db, ChatHistory, TikTokVideo, TikTokProfile
+from database import get_db, init_db, ChatHistory, TikTokVideo, TikTokProfile, InstagramProfile, InstagramPost
 from sqlalchemy import select, func
 from dotenv import load_dotenv
 from services.tiktok import TikTokService
 from services.groq import GroqService
+from services.instagram import InstagramService
 
 # Load environment variables from .env file
 load_dotenv()
@@ -157,6 +158,39 @@ class TikTokVideoResponse(BaseModel):
     thumbnail_url: Optional[str] = None
     video_url: str
 
+class InstagramScrapeRequest(BaseModel):
+    username: str
+
+class InstagramScrapeResponse(BaseModel):
+    username: str
+    posts_saved: int
+    profile_saved: bool = False
+    error: Optional[str] = None
+    success: bool = True
+
+class InstagramProfileResponse(BaseModel):
+    username: str
+    full_name: Optional[str] = None
+    biography: Optional[str] = None
+    followers_count: int = 0
+    following_count: int = 0
+    posts_count: int = 0
+    is_private: bool = False
+    is_verified: bool = False
+    avatar_url: Optional[str] = None
+
+class InstagramPostResponse(BaseModel):
+    id: str
+    username: str
+    caption: Optional[str] = None
+    likes: int
+    comments: int
+    media_type: str
+    image_url: str
+    permalink: str
+    timestamp: str
+    children: Optional[List[Dict[str, Any]]] = None
+
 @app.on_event("startup")
 async def startup_event():
     await init_db()
@@ -243,7 +277,7 @@ async def get_chat_history(
         logger.error(f"Error fetching chat history: {str(e)}", exc_info=True)
         return {"error": str(e)}
 
-@app.post("/tiktok/scrape-videos", response_model=TikTokScrapeResponse)
+@app.post("/tiktok/scrape-posts", response_model=TikTokScrapeResponse)
 async def scrape_tiktok_videos(
     request: TikTokScrapeRequest,
     db: AsyncSession = Depends(get_db),
@@ -262,16 +296,16 @@ async def scrape_tiktok_videos(
     logger.info(f"Received request to scrape TikTok videos for username: {request.username}")
     
     try:
-        tiktok_service = TikTokService()
-        result = await tiktok_service.scrape_user_videos(db, request.username)
+        tiktok_service = TikTokService(db)
+        result = await tiktok_service.scrape_user_videos(request.username)
         
         return TikTokScrapeResponse(
-            username=result["username"],
-            videos_saved=result["videos_saved"],
-            latest_video_date=result["latest_video_date"],
-            profile_saved=result["profile_saved"],
+            username=request.username,
+            videos_saved=result.get("videos_saved", 0),
+            latest_video_date=result.get("latest_video_date"),
+            profile_saved=result.get("profile_saved", False),
             error=result.get("error"),
-            success=result.get("success", True)
+            success=True
         )
     except Exception as e:
         logger.error(f"Error scraping TikTok videos: {str(e)}", exc_info=True)
@@ -297,15 +331,15 @@ async def scrape_tiktok_profile(
     logger.info(f"Received request to scrape TikTok profile for username: {request.username}")
     
     try:
-        tiktok_service = TikTokService()
-        result = await tiktok_service.scrape_user_profile(db, request.username)
+        tiktok_service = TikTokService(db)
+        result = await tiktok_service.scrape_user_profile(request.username)
         
         return TikTokProfileScrapeResponse(
-            username=result["username"],
-            profile_data=result["profile_data"],
-            profile_updated=result.get("profile_updated", False),
+            username=request.username,
+            profile_data=result.get("profile_data"),
+            profile_updated=result.get("profile_saved", False),
             error=result.get("error"),
-            success=result.get("success", True)
+            success=True
         )
     except Exception as e:
         logger.error(f"Error scraping TikTok profile: {str(e)}", exc_info=True)
@@ -333,7 +367,7 @@ async def get_tiktok_recommendations(
             TikTokVideo.username == request.username
         ).order_by(
             (TikTokVideo.likes + TikTokVideo.comments + TikTokVideo.shares + TikTokVideo.views).desc()
-        ).limit(10)
+        ).limit(30)
         
         result = await db.execute(query)
         videos = result.scalars().all()
@@ -519,4 +553,174 @@ async def get_tiktok_videos(
         raise
     except Exception as e:
         logger.error(f"Error fetching TikTok videos: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/instagram/scrape-posts", response_model=InstagramScrapeResponse)
+async def scrape_instagram(
+    request: InstagramScrapeRequest,
+    db: AsyncSession = Depends(get_db),
+    api_key: str = Depends(get_api_key)
+):
+    """
+    Scrape Instagram profile and posts for a specific username.
+    
+    Args:
+        request: Request containing the username to scrape
+        db: Database session
+        
+    Returns:
+        Summary of the scraping operation
+    """
+    logger.info(f"Received request to scrape Instagram for username: {request.username}")
+    
+    try:
+        instagram_service = InstagramService(db)
+        result = await instagram_service.scrape_profile(request.username)
+        
+        return InstagramScrapeResponse(
+            username=request.username,
+            posts_saved=result.get("posts_saved", 0),
+            profile_saved=result.get("profile_saved", False),
+            error=result.get("error"),
+            success=True
+        )
+    except Exception as e:
+        logger.error(f"Error scraping Instagram: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/instagram/profile/{username}", response_model=InstagramProfileResponse)
+async def get_instagram_profile(
+    username: str,
+    db: AsyncSession = Depends(get_db),
+    api_key: str = Depends(get_api_key)
+):
+    """
+    Get Instagram profile information for a specific username.
+    
+    Args:
+        username: Instagram username
+        db: Database session
+        
+    Returns:
+        Instagram profile data
+    """
+    logger.info(f"Getting Instagram profile for username: {username}")
+    try:
+        query = select(InstagramProfile).where(InstagramProfile.username == username)
+        result = await db.execute(query)
+        profile = result.scalars().first()
+        
+        if not profile:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Profile not found for user: {username}"
+            )
+        
+        return InstagramProfileResponse(
+            username=profile.username,
+            full_name=profile.full_name,
+            biography=profile.biography,
+            followers_count=profile.followers_count,
+            following_count=profile.following_count,
+            posts_count=profile.posts_count,
+            is_private=bool(profile.is_private),
+            is_verified=bool(profile.is_verified),
+            avatar_url=profile.avatar_url
+        )
+    except HTTPException as e:
+        # Re-raise HTTP exceptions as-is
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching Instagram profile: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/instagram/posts/{username}", response_model=List[InstagramPostResponse])
+async def get_instagram_posts(
+    username: str,
+    limit: int = 50,
+    offset: int = 0,
+    sort_by: str = "timestamp",
+    order: str = "desc",
+    db: AsyncSession = Depends(get_db),
+    api_key: str = Depends(get_api_key)
+):
+    """
+    Get posts for a specific Instagram user.
+    
+    Args:
+        username: Instagram username
+        limit: Maximum number of posts to return (default: 50)
+        offset: Number of posts to skip (for pagination)
+        sort_by: Field to sort by (timestamp, like_count, comment_count)
+        order: Sort order (asc or desc)
+        db: Database session
+        
+    Returns:
+        List of Instagram posts
+    """
+    logger.info(f"Getting posts for username: {username}, limit: {limit}, offset: {offset}, sort_by: {sort_by}, order: {order}")
+    try:
+        # Validate sort_by field
+        valid_sort_fields = ["timestamp", "likes", "comments"]
+        if sort_by not in valid_sort_fields:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid sort_by field. Must be one of: {', '.join(valid_sort_fields)}"
+            )
+            
+        # Validate order
+        if order not in ["asc", "desc"]:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid order. Must be 'asc' or 'desc'"
+            )
+            
+        # Build the query with a join to InstagramProfile
+        query = select(InstagramPost).join(
+            InstagramProfile,
+            InstagramPost.profile_id == InstagramProfile.id
+        ).where(InstagramProfile.username == username)
+        
+        # Apply sorting
+        if sort_by == "timestamp":
+            query = query.order_by(InstagramPost.timestamp.desc() if order == "desc" else InstagramPost.timestamp.asc())
+        elif sort_by == "likes":
+            query = query.order_by(InstagramPost.likes.desc() if order == "desc" else InstagramPost.likes.asc())
+        elif sort_by == "comments":
+            query = query.order_by(InstagramPost.comments.desc() if order == "desc" else InstagramPost.comments.asc())
+            
+        # Apply pagination
+        query = query.offset(offset).limit(limit)
+        
+        # Execute query
+        result = await db.execute(query)
+        posts = result.scalars().all()
+        
+        if not posts:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No posts found for user: {username}"
+            )
+            
+        # Convert to response model
+        return [
+            InstagramPostResponse(
+                id=post.id,
+                username=username,  # Use the username from the request
+                caption=post.caption,
+                likes=post.likes,
+                comments=post.comments,
+                media_type="image",  # Default to image since we don't store media type
+                image_url=post.image_url,
+                permalink=post.post_url,
+                timestamp=post.timestamp.isoformat(),
+                children=None  # We don't store children in the database
+            )
+            for post in posts
+        ]
+    except HTTPException as e:
+        # Re-raise HTTP exceptions as-is
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching Instagram posts: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")

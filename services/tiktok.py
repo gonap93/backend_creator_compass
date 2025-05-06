@@ -8,6 +8,7 @@ from sqlalchemy import select
 from apify_client import ApifyClient
 
 from database import TikTokVideo, TikTokProfile
+from services.apify import ApifyService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -16,12 +17,9 @@ logger = logging.getLogger(__name__)
 class TikTokService:
     """Service for handling TikTok video scraping and storage."""
     
-    def __init__(self):
-        self.apify_token = os.getenv("APIFY_TOKEN")
-        if not self.apify_token:
-            raise ValueError("APIFY_TOKEN environment variable is not set")
-            
-        self.client = ApifyClient(self.apify_token)
+    def __init__(self, db: AsyncSession):
+        self.db = db
+        self.apify = ApifyService()
 
     async def run_scraper(self, username: str) -> Dict[str, Any]:
         """
@@ -52,8 +50,8 @@ class TikTokService:
             logger.info(f"Run input configuration: {run_input}")
 
             # Run the Actor and wait for it to finish
-            run = self.client.actor("clockworks/tiktok-scraper").call(run_input=run_input)
-            logger.info(f"Run started with ID: {run.get('id')}")
+            run = self.apify.run_actor("clockworks/tiktok-scraper", run_input)
+            logger.info(f"Run started with ID: {run['id']}")
             
             return run
         except Exception as e:
@@ -68,7 +66,7 @@ class TikTokService:
             run_id: The ID of the run to wait for
         """
         while True:
-            run = self.client.run(run_id).get()
+            run = self.apify.run(run_id).get()
             status = run.get("status")
             logger.info(f"Run status: {status}")
             
@@ -94,7 +92,7 @@ class TikTokService:
         logger.info(f"Fetching dataset items from dataset ID: {dataset_id}")
         try:
             # Get the dataset items
-            dataset = self.client.dataset(dataset_id)
+            dataset = self.apify.dataset(dataset_id)
             items = list(dataset.list_items().items)
             
             logger.info(f"Retrieved {len(items)} items from dataset")
@@ -171,7 +169,7 @@ class TikTokService:
                 "views": int(video_data.get("playCount", 0)),
                 "publish_date": datetime.fromisoformat(create_time.replace("Z", "+00:00")).replace(tzinfo=None),
                 "music": video_data.get("musicMeta", {}).get("musicAuthor", ""),
-                "thumbnail_url": video_data.get("videoMeta", {}).get("coverUrl", ""),
+                "thumbnail_url": video_data.get("videoMeta", {}).get("originalCoverUrl", ""),
                 "video_url": video_url,
             }
             
@@ -185,12 +183,11 @@ class TikTokService:
             logger.error(f"Error parsing video data: {str(e)}")
             raise
 
-    async def save_videos(self, db: AsyncSession, videos_data: List[Dict[str, Any]]) -> int:
+    async def save_videos(self, videos_data: List[Dict[str, Any]]) -> int:
         """
         Save multiple videos to the database.
         
         Args:
-            db: Database session
             videos_data: List of video data to save
             
         Returns:
@@ -220,7 +217,7 @@ class TikTokService:
             
             # Query existing videos with these URLs
             query = select(TikTokVideo.video_url).where(TikTokVideo.video_url.in_(video_urls))
-            result = await db.execute(query)
+            result = await self.db.execute(query)
             existing_urls = {row[0] for row in result}
             
             # Filter out videos that already exist
@@ -231,292 +228,215 @@ class TikTokService:
                 return 0
                 
             logger.info(f"Attempting to save {len(new_videos)} new videos to database")
-            db.add_all(new_videos)
-            await db.commit()
+            self.db.add_all(new_videos)
+            await self.db.commit()
             logger.info(f"Successfully saved {len(new_videos)} new videos to database")
             return len(new_videos)
         except Exception as e:
             logger.error(f"Error saving videos to database: {str(e)}")
-            await db.rollback()
+            await self.db.rollback()
             raise
 
-    async def get_latest_video_date(self, db: AsyncSession, username: str) -> Optional[datetime]:
+    async def get_latest_video_date(self, username: str) -> Optional[datetime]:
         """
         Get the date of the most recent video for a user.
         
         Args:
-            db: Database session
             username: TikTok username
             
         Returns:
-            Datetime of the most recent video or None if no videos exist
+            Datetime of the most recent video, or None if no videos exist
         """
-        query = select(TikTokVideo.publish_date)\
-            .where(TikTokVideo.username == username)\
-            .order_by(TikTokVideo.publish_date.desc())\
-            .limit(1)
-        
-        result = await db.execute(query)
-        row = result.first()
-        return row[0] if row else None
+        try:
+            query = select(TikTokVideo.publish_date).where(
+                TikTokVideo.username == username
+            ).order_by(TikTokVideo.publish_date.desc()).limit(1)
+            
+            result = await self.db.execute(query)
+            latest_date = result.scalar_one_or_none()
+            
+            return latest_date
+        except Exception as e:
+            logger.error(f"Error getting latest video date: {str(e)}")
+            raise
 
     def parse_profile_data(self, video_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
-        Parse TikTok profile data from the video response.
+        Parse profile data from video data.
         
         Args:
-            video_data: Raw video data from Apify
+            video_data: Video data containing profile information
             
         Returns:
-            Parsed profile data or None if authorMeta is missing
+            Parsed profile data or None if data is incomplete
         """
         try:
-            # Check if authorMeta exists
-            author_meta = video_data.get("authorMeta")
+            author_meta = video_data.get("authorMeta", {})
             if not author_meta:
-                logger.warning("No authorMeta found in video data")
                 return None
                 
-            logger.info(f"Parsing profile data from authorMeta: {author_meta}")
-            
-            # Extract profile data
-            parsed_profile = {
+            return {
                 "username": author_meta.get("name"),
-                "verified": int(author_meta.get("verified", 0)),
-                "private_account": int(author_meta.get("privateAccount", 0)),
-                "region": author_meta.get("region", ""),
-                "following": int(author_meta.get("following", 0)),
-                "friends": int(author_meta.get("friends", 0)),
-                "fans": int(author_meta.get("fans", 0)),
-                "heart": int(author_meta.get("heart", 0)),
-                "video": int(author_meta.get("video", 0)),
-                "avatar_url": author_meta.get("avatar", ""),  # Add avatar URL from authorMeta
-                "signature": author_meta.get("signature", "")  # Add signature from authorMeta
+                "verified": 1 if author_meta.get("verified") else 0,
+                "private_account": 1 if author_meta.get("private") else 0,
+                "region": author_meta.get("region"),
+                "following": author_meta.get("following"),
+                "friends": author_meta.get("friends"),
+                "fans": author_meta.get("fans"),
+                "heart": author_meta.get("heart"),
+                "video": author_meta.get("video"),
+                "avatar_url": author_meta.get("avatar"),
+                "signature": author_meta.get("signature")
             }
-            
-            # Ensure username exists
-            if not parsed_profile["username"]:
-                logger.error("Missing username in profile data")
-                return None
-                
-            logger.info(f"Successfully parsed profile data: {parsed_profile}")
-            return parsed_profile
         except Exception as e:
             logger.error(f"Error parsing profile data: {str(e)}")
             return None
-            
-    async def save_profile(self, db: AsyncSession, profile_data: Dict[str, Any]) -> bool:
+
+    async def save_profile(self, profile_data: Dict[str, Any]) -> bool:
         """
-        Save profile data to the database.
+        Save or update a TikTok profile in the database.
         
         Args:
-            db: Database session
-            profile_data: Parsed profile data
+            profile_data: Profile data to save
             
         Returns:
-            True if profile was saved, False otherwise
+            True if profile was saved/updated, False otherwise
         """
         try:
-            # Check if profile already exists
-            username = profile_data["username"]
-            query = select(TikTokProfile).where(TikTokProfile.username == username)
-            result = await db.execute(query)
-            existing_profile = result.scalars().first()
+            if not profile_data:
+                return False
+                
+            # Check if profile exists
+            query = select(TikTokProfile).where(TikTokProfile.username == profile_data["username"])
+            result = await self.db.execute(query)
+            existing_profile = result.scalar_one_or_none()
             
             if existing_profile:
-                logger.info(f"Updating existing profile for user: {username}")
                 # Update existing profile
                 for key, value in profile_data.items():
-                    if hasattr(existing_profile, key):
-                        setattr(existing_profile, key, value)
-                profile = existing_profile
+                    setattr(existing_profile, key, value)
             else:
-                logger.info(f"Creating new profile for user: {username}")
                 # Create new profile
                 profile = TikTokProfile(**profile_data)
-                db.add(profile)
-                
-            await db.commit()
-            logger.info(f"Successfully saved profile for: {username}")
+                self.db.add(profile)
+            
+            await self.db.commit()
             return True
         except Exception as e:
             logger.error(f"Error saving profile: {str(e)}")
-            await db.rollback()
+            await self.db.rollback()
             return False
-    
-    async def extract_and_save_profile(self, db: AsyncSession, videos: List[Dict[str, Any]]) -> bool:
+
+    async def extract_and_save_profile(self, videos: List[Dict[str, Any]]) -> bool:
         """
-        Extract profile data from videos and save it.
+        Extract and save profile information from video data.
         
         Args:
-            db: Database session
             videos: List of video data
             
         Returns:
-            True if profile was extracted and saved, False otherwise
-        """
-        if not videos:
-            logger.warning("No videos to extract profile from")
-            return False
-            
-        # We only need the first video to get the profile data
-        profile_data = self.parse_profile_data(videos[0])
-        if not profile_data:
-            logger.warning("Could not parse profile data from videos")
-            return False
-            
-        return await self.save_profile(db, profile_data)
-
-    async def scrape_user_videos(self, db: AsyncSession, username: str) -> Dict[str, Any]:
-        """
-        Main function to scrape and save videos and profile data for a user.
-        
-        Args:
-            db: Database session
-            username: TikTok username to scrape
-            
-        Returns:
-            Summary of the operation
+            True if profile was saved/updated, False otherwise
         """
         try:
-            logger.info(f"Starting video scraping for user: {username}")
-            
-            # Run the scraper
-            run_data = await self.run_scraper(username)
-            run_id = run_data["id"]
-            logger.info(f"Scraper run started with ID: {run_id}")
-            
-            # Wait for completion
-            await self.wait_for_run_to_finish(run_id)
-            
-            # Get the results
-            dataset_id = run_data["defaultDatasetId"]
-            logger.info(f"Fetching results from dataset: {dataset_id}")
-            videos = await self.get_dataset_items(dataset_id)
-            
             if not videos:
-                logger.warning(f"No videos found for user: {username}")
-                return {
-                    "username": username,
-                    "videos_saved": 0,
-                    "latest_video_date": None,
-                    "profile_saved": False,
-                    "error": "No videos found for this user"
-                }
-            
-            # Extract and save profile data
-            profile_saved = await self.extract_and_save_profile(db, videos)
-            logger.info(f"Profile data saved: {profile_saved}")
-            
-            # Save videos to database
-            saved_count = await self.save_videos(db, videos)
-            
-            # Get the most recent video date
-            latest_video_date = await self.get_latest_video_date(db, username)
-            
-            logger.info(f"Scraping completed successfully for user: {username}")
-            return {
-                "username": username,
-                "videos_saved": saved_count,
-                "latest_video_date": latest_video_date.isoformat() if latest_video_date else None,
-                "profile_saved": profile_saved,
-                "success": True
-            }
+                return False
+                
+            # Get profile data from the first video
+            profile_data = self.parse_profile_data(videos[0])
+            if not profile_data:
+                return False
+                
+            return await self.save_profile(profile_data)
         except Exception as e:
-            logger.error(f"Error during scraping: {str(e)}")
-            return {
-                "username": username,
-                "videos_saved": 0,
-                "latest_video_date": None,
-                "profile_saved": False,
-                "error": str(e),
-                "success": False
-            }
+            logger.error(f"Error extracting and saving profile: {str(e)}")
+            return False
 
-    async def scrape_user_profile(self, db: AsyncSession, username: str) -> Dict[str, Any]:
+    async def scrape_user_videos(self, username: str) -> Dict[str, Any]:
         """
-        Scrape only the profile information for a TikTok user without fetching videos.
-        Uses the Apify TikTok Profile Scraper.
+        Scrape videos for a TikTok user.
         
         Args:
-            db: Database session
             username: TikTok username to scrape
             
         Returns:
-            Profile data and operation summary
+            Dict containing scraping results
         """
         try:
-            logger.info(f"Starting profile scraping for user: {username}")
-            
-            # Format the username to ensure it's a valid profile identifier
+            # Format username
             formatted_username = username.strip('@')
             
-            # Configure the input for the TikTok Profile Scraper
+            # Configure run input
             run_input = {
                 "profiles": [formatted_username],
-                "shouldDownloadCovers": False,
+                "resultsPerPage": 50,
+                "shouldDownloadCovers": True,
                 "shouldDownloadVideos": False,
                 "shouldDownloadSlideshowImages": False,
-                "shouldDownloadSubtitles": False,
-                "resultsPerPage": 1  # We only need one result to get the profile
+                "maxProfilesPerQuery": 1
             }
+
+            # Run the actor and get results
+            run = await self.apify.run_actor("clockworks/tiktok-scraper", run_input)
+            await self.apify.wait_for_run_to_finish(run["id"])
+            items = await self.apify.get_dataset_items(run["defaultDatasetId"])
             
-            # Run the TikTok Profile Scraper actor
-            logger.info(f"Starting TikTok Profile Scraper for username: {formatted_username}")
-            run = self.client.actor("clockworks/tiktok-profile-scraper").call(run_input=run_input)
-            run_id = run.get("id")
-            logger.info(f"Profile scraper run started with ID: {run_id}")
+            # Check if we have the expected structure
+            if items and "authorUsername" not in items[0] and "username" not in items[0]:
+                logger.warning("The response structure doesn't match our expectations. Trying to adapt.")
+                if "items" in items[0]:
+                    logger.info("Found nested 'items' field, extracting videos from there")
+                    all_videos = []
+                    for item in items:
+                        if "items" in item and isinstance(item["items"], list):
+                            all_videos.extend(item["items"])
+                    items = all_videos
+                    logger.info(f"Extracted {len(items)} videos from nested structure")
             
-            # Wait for completion
-            await self.wait_for_run_to_finish(run_id)
+            # Save videos to database
+            videos_saved = await self.save_videos(items)
             
-            # Get the results
-            dataset_id = run.get("defaultDatasetId")
-            logger.info(f"Fetching profile results from dataset: {dataset_id}")
+            # Get the most recent video date
+            latest_video_date = await self.get_latest_video_date(formatted_username)
             
-            # Get the dataset items
-            dataset = self.client.dataset(dataset_id)
-            items = list(dataset.list_items().items)
+            # Extract and save profile data
+            profile_saved = await self.extract_and_save_profile(items)
             
-            if not items:
-                logger.warning(f"No profile data found for user: {username}")
-                return {
-                    "username": username,
-                    "profile_data": None,
-                    "profile_updated": False,
-                    "error": "No profile data found for this user",
-                    "success": False
-                }
-            
-            # Extract profile data from the first item
-            profile_data = self.parse_profile_data(items[0])
-            if not profile_data:
-                logger.warning(f"Could not parse profile data for user: {username}")
-                return {
-                    "username": username,
-                    "profile_data": None,
-                    "profile_updated": False,
-                    "error": "Could not parse profile data",
-                    "success": False
-                }
-            
-            # Update the database if needed
-            profile_updated = await self.save_profile(db, profile_data)
-            logger.info(f"Profile data updated in database: {profile_updated}")
-            
-            # Return the profile data directly
             return {
-                "username": username,
-                "profile_data": profile_data,
-                "profile_updated": profile_updated,
-                "success": True
+                "videos_saved": videos_saved,
+                "latest_video_date": latest_video_date.isoformat() if latest_video_date else None,
+                "profile_saved": profile_saved,
+                "run_id": run["id"]
             }
         except Exception as e:
-            logger.error(f"Error during profile scraping: {str(e)}")
+            logger.error(f"Error scraping user videos: {str(e)}")
+            raise
+
+    async def scrape_user_profile(self, username: str) -> Dict[str, Any]:
+        """
+        Scrape profile information for a TikTok user.
+        
+        Args:
+            username: TikTok username to scrape
+            
+        Returns:
+            Dict containing profile data
+        """
+        try:
+            # First scrape videos to get profile data
+            result = await self.scrape_user_videos(username)
+            videos = result["videos"]
+            
+            if not videos:
+                raise Exception("No videos found for user")
+                
+            # Extract and save profile data
+            profile_saved = await self.extract_and_save_profile(videos)
+            
             return {
-                "username": username,
-                "profile_data": None,
-                "profile_updated": False,
-                "error": str(e),
-                "success": False
-            } 
+                "profile_saved": profile_saved,
+                "videos_count": len(videos),
+                "run_id": result["run_id"]
+            }
+        except Exception as e:
+            logger.error(f"Error scraping user profile: {str(e)}")
+            raise 
